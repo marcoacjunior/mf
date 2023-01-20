@@ -17,18 +17,15 @@ import com.devsuperior.movieflix.services.ReviewService;
 
 @RestController
 @RequestMapping("/reviews")
-public class ReviewResource {
+public class ReviewResource {   
 
     @Autowired
-    private ReviewService service;
+    private ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<ReviewDTO> create(@Valid @RequestBody ReviewDTO dto) {
-        dto = service.save(dto);
-
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(dto.getId()).toUri();
-
+    public ResponseEntity<ReviewDTO> newReview(@Valid @RequestBody ReviewDTO dto){
+        dto = reviewService.saveReview(dto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
 }

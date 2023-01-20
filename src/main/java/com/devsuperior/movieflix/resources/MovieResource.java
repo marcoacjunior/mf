@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,24 +21,27 @@ import com.devsuperior.movieflix.services.MovieService;
 public class MovieResource {
 
     @Autowired
-    private MovieService service;
+    private MovieService movieService;
 
     @GetMapping
-    public ResponseEntity<Page<MovieDTO>> findByGenre(
-            @RequestParam(defaultValue = "0") Long genreId,
-            @PageableDefault(sort = { "title" }) Pageable pageable
-    ) {
-        Page<MovieDTO> result = service.findAll(genreId, pageable);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Page<MovieDTO>> findAllPageMovieByGenre(
+            @RequestParam(value = "genreId", defaultValue = "0") Long genreId,
+            Pageable pageable) {
+        Page<MovieDTO> listMovies = movieService.findAllPageMovieByGenre(genreId, pageable);
+        return ResponseEntity.ok().body(listMovies);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MovieDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<MovieDTO> findById(@PathVariable Long id){
+        MovieDTO movieDTO = movieService.findById(id);
+        return ResponseEntity.ok().body(movieDTO);
     }
 
-    @GetMapping("/{id}/reviews")
-    public ResponseEntity<List<ReviewDTO>> findMovieReviews(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findMovieReviews(id));
+    @GetMapping(value = "/{idMovie}/reviews")
+    public ResponseEntity<List<ReviewDTO>> findByReviewMovieId(@PathVariable Long idMovie){
+        List<ReviewDTO> reviewDTO = movieService.findByReviewMovieId(idMovie);
+        return ResponseEntity.ok().body(reviewDTO);
     }
+
+
 }

@@ -7,18 +7,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devsuperior.movieflix.dto.UserDTO;
-import com.devsuperior.movieflix.entities.User;
-import com.devsuperior.movieflix.services.AuthService;
+import com.devsuperior.movieflix.services.UserService;
 
 @RestController
 @RequestMapping("/users")
-public class UserResource {
+public class UserResource {   
 
-    @Autowired private AuthService authService;
+    @Autowired
+    private UserService service;
 
     @GetMapping("/profile")
-    public ResponseEntity<UserDTO> getProfiles() {
-        User user = authService.authenticated();
-        return ResponseEntity.ok(new UserDTO(user));
+    public ResponseEntity<UserDTO> findByLoggedUser() {
+        UserDTO dto = service.findByLoggedUser();
+        return ResponseEntity.ok().body(dto);
     }
 }

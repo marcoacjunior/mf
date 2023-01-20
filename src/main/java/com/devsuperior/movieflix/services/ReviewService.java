@@ -1,44 +1,46 @@
 package com.devsuperior.movieflix.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.movieflix.dto.ReviewDTO;
-import com.devsuperior.movieflix.entities.Movie;
 import com.devsuperior.movieflix.entities.Review;
 import com.devsuperior.movieflix.entities.User;
 import com.devsuperior.movieflix.repositories.MovieRepository;
 import com.devsuperior.movieflix.repositories.ReviewRepository;
+import com.devsuperior.movieflix.services.exceptions.UnauthorizedException;
 
 @Service
 public class ReviewService {
 
     @Autowired
-    private ReviewRepository repository;
-
+    private ReviewRepository reviewRepository;
     @Autowired
     private MovieRepository movieRepository;
 
     @Autowired
     private AuthService authService;
 
+    @PreAuthorize("hasAnyRole('MEMBER')")
     @Transactional
-    public ReviewDTO save(ReviewDTO dto) {
-        Review review = mapToEntity(dto);
-        review = repository.save(review);
-        return new ReviewDTO(review);
-    }
+    public ReviewDTO saveReview(ReviewDTO reviewDTO){
 
-    private Review mapToEntity(ReviewDTO dto) {
+    try{
+        Review newReview = new Review();
         User user = authService.authenticated();
-        Movie movie = movieRepository.getOne(dto.getMovieId());
+        newReview.setId(reviewDTO.getId());
+        newReview.setText(reviewDTO.getText());
+        newReview.setMovie(movieRepository.getOne(reviewDTO.getMovieId()));
+        newReview.setUser(user);
+        reviewRepository.save(newReview);
+        return new ReviewDTO(newReview);
+    } catch (RuntimeException e){
+        throw new UnauthorizedException("Usuário não autorizado");
+    }
+ 
 
-        Review entity = new Review();
-        entity.setMovie(movie);
-        entity.setText(dto.getText());
-        entity.setUser(user);
 
-        return entity;
     }
 }

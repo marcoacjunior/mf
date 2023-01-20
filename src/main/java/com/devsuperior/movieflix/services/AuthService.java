@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.movieflix.entities.User;
 import com.devsuperior.movieflix.repositories.UserRepository;
-import com.devsuperior.movieflix.services.exceptions.UnathorizedException;
+import com.devsuperior.movieflix.services.exceptions.UnauthorizedException;
 
 @Service
 public class AuthService {
@@ -20,7 +20,7 @@ public class AuthService {
             String username = SecurityContextHolder.getContext().getAuthentication().getName();
             return userRepository.findByEmail(username);
         } catch (Exception ex) {
-            throw new UnathorizedException("Invalid user");
+            throw new UnauthorizedException("Invalid user");
         }
     }
 }
